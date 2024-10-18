@@ -20,20 +20,6 @@ try:
 except:
     pass
 
-#cur.execute("""
-#    INSERT INTO task VALUES
-#        ('Tank game', 'IMPORTANT', 'Working'),
-#        ('MVC', 'Medium', 'Done')
-#""")
-# con.commit()
-# res = cur.execute("SELECT * FROM task")
-# print(res.fetchall())
-
-# task_one = Task("Tank game", 2, "Working")
-# task_two = Task("MVC", 1, "Plan")
-# task_three = Task("Kill someone", 1, "Done")
-
-
 is_running = True
 
 task_collection = []
@@ -73,12 +59,6 @@ def try_int_input(prompt: str = "Enter number: "):
         return try_int_input("Try again: ")
 
 def Load_data():
-    # for a in cur.execute("SELECT * FROM task"):
-    #     tasks.append(a)
-
-    # res = cur.execute("SELECT * FROM task")
-    # tasks = res.fetchall()
-
     tasks = {}
     for row in cur.execute("SELECT * FROM task"):
         tasks[row[0]] = Task(row[1], row[2], row[3])
@@ -86,21 +66,19 @@ def Load_data():
     return tasks
 
 def Create_task():
+    data = []
     task_name = input("Enter task name: ")
+    data.append(task_name)
     priority = try_int_input("Enter priority of task: ")
+    data.append(priority)
     status = try_int_input("Enter status of task: ")
+    data.append(status)
 
-    # TODO: list                       opravit kys injection
-    cur.execute(f" INSERT INTO task (task_name, priority, status) VALUES ('{task_name}', '{priority_names[priority-1]}', '{status_names[status-1]}') ")
+    sql = f" INSERT INTO task (task_name, priority, status) VALUES (?, ?, ?) "
+
+    cur.execute(sql, data)
     con.commit()
-    
-    # task_name = Task(task_name, priority_names[priority-1], status_names[status-1])
 
-    # task_collection.append(task_name)
-    # print(task_name)
-
-
-# UDĚLAT UPRAVOVANI TASKU S TIM, ZE SE BUDOU UPRAVOVAT DO DATABAZE
 def Change_task_atributs():
     Print_tasks()
 
@@ -118,69 +96,41 @@ def Change_task_atributs():
 
     task = tasks[task_id]
 
-    # modifications = [task.Change_name, task.Change_status, task.Change_priority]
-
-    # change_atribute = modifications[chosen_modification-1]
     collums = ("task_name", "priority", "status")
 
+    data = []
     if chosen_modification == 1:
         new_name = input("Enter new task name: ")
+        data.append(new_name)
         # change_atribute(new_name)
-        cur.execute(f" UPDATE task SET {collums[chosen_modification-1]} = '{new_name}' WHERE id = {task_id} ")
-        con.commit()
+        sql = f" UPDATE task SET {collums[chosen_modification-1]} = ? WHERE id = {task_id} "
+        cur.execute(sql, data)
+        # con.commit()
     
     elif chosen_modification == 2:
         new_atribute_number = try_int_input("Enter new priority value: ")
         # change_atribute(new_atribute_number-1)
-        cur.execute(f" UPDATE task SET {collums[chosen_modification-1]} = '{priority_names[new_atribute_number-1]}' WHERE id = {task_id} ")
-        con.commit()
+        data.append(priority_names[new_atribute_number-1])
+        sql = f"UPDATE task SET {collums[chosen_modification-1]} = ? WHERE id = {task_id} "
+        cur.execute(sql, data)
+        # con.commit()
 
     elif chosen_modification == 3:
         new_atribute_number = try_int_input("Enter new status value: ")
         # change_atribute(new_atribute_number-1)
-        cur.execute(f" UPDATE task SET {collums[chosen_modification-1]} = '{status_names[new_atribute_number-1]}' WHERE id = {task_id} ")
-        con.commit()
+        data.append(status_names[new_atribute_number-1])
+        sql = f" UPDATE task SET {collums[chosen_modification-1]} = ? WHERE id = {task_id} "
+        cur.execute(sql, data)
+        # con.commit()
     else:
         return
-
-    # if user_change == 1:
-    #     # atribute_change = input("Enter new task name: ")
-    #     # task_collection[change_task_input_index].Change_name(atribute_change)
-    #     pick_data[change_task_input-1][user_change-1] = "ahoj"
-
-    # elif user_change == 2:
-    #     atribute_change = int(input("Enter new task priority: "))
-    #     task_collection[change_task_input_index].Change_priority(priority_names[atribute_change-1])
-    # elif user_change == 3:
-    #     atribute_change = int(input("Enter new task status: "))
-    #     task_collection[change_task_input_index].Change_status(status_names[atribute_change-1])
-    
-    # print(pick_data[change_task_input-1])
-    # print(task_collection[change_task_input_index])
+    con.commit()
 
 def Print_tasks():
     tasks = Load_data()
-    # index = 1
-    # for a in cur.execute("SELECT * FROM task"):
-    #     print(f"{index}]", end=" ")
-    #     for b in a:
-    #         print(b, end=", ")
-    #     print(" ")
-    #     index+=1
-
-    # for a in range(len(task_collection)):
-    #     print(f"{a+1}]{task_collection[a]}")
 
     for id, task in tasks.items():
         print(f"{id}] {task}")
-
-# task_one = Task("Tank game", 2, "Working")
-# task_two = Task("MVC", 1, "Plan")
-# task_three = Task("Kill someone", 1, "Done")
-
-# task_collection.append(task_one)
-# task_collection.append(task_two)
-# task_collection.append(task_three)
 
 while is_running:
     for a in range(len(user_menu)):
