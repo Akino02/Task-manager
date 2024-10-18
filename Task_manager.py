@@ -24,12 +24,13 @@ is_running = True
 
 task_collection = []
 
-user_menu = ["Create Task", "Change Task", "Print Tasks", "Close this app"]
+user_menu = ["Create Task", "Change Task", "Delete Task" , "Print Tasks", "Close this app"]
 
 priority_names = ["Not important", "Medium", "IMPORTANT"]
 status_names = ["Plan", "Working", "Done"]
 
 task_modifications = ["Change name", "Change priority", "Change status"]
+task_deletation_approve = ["Yes", "No"]
 
 class Task():
     def __init__(self, task_name: str, priority: str, status: str):
@@ -58,14 +59,14 @@ def try_int_input(prompt: str = "Enter number: "):
     except:
         return try_int_input("Try again: ")
 
-def Load_data():
+def load_data():
     tasks = {}
     for row in cur.execute("SELECT * FROM task"):
         tasks[row[0]] = Task(row[1], row[2], row[3])
 
     return tasks
 
-def Create_task():
+def create_task():
     data = []
     task_name = input("Enter task name: ")
     data.append(task_name)
@@ -79,10 +80,10 @@ def Create_task():
     cur.execute(sql, data)
     con.commit()
 
-def Change_task_atributs():
-    Print_tasks()
+def change_task_atributs():
+    print_tasks()
 
-    tasks = Load_data()
+    tasks = load_data()
 
     task_id = try_int_input("Enter task number: ")
 
@@ -94,7 +95,7 @@ def Change_task_atributs():
     
     chosen_modification = try_int_input("Enter atribute to be changed: ")
 
-    task = tasks[task_id]
+    # task = tasks[task_id]
 
     collums = ("task_name", "priority", "status")
 
@@ -126,8 +127,32 @@ def Change_task_atributs():
         return
     con.commit()
 
-def Print_tasks():
-    tasks = Load_data()
+def detele_task():
+    print_tasks()
+
+    tasks = load_data()
+
+    task_id = try_int_input("Enter task number: ")
+
+    if task_id not in tasks.keys():
+        return
+    
+    print("Are you really sure that you want to delete your task ?")
+    for count, answear in enumerate(task_deletation_approve):
+        print(f"{count+1}) {answear}")
+    
+    chosen_answear = try_int_input()
+
+    if chosen_answear == 1:
+        cur.execute(f"DELETE FROM task WHERE id = {task_id}")
+        con.commit()
+        print("Task deleted :))")
+    else:
+        return
+
+
+def print_tasks():
+    tasks = load_data()
 
     for id, task in tasks.items():
         print(f"{id}] {task}")
@@ -141,12 +166,14 @@ while is_running:
     os.system("cls")
 
     if user_pick == 1:
-        Create_task()
+        create_task()
     elif user_pick == 2:
-        Change_task_atributs()
+        change_task_atributs()
     elif user_pick == 3:
-        Print_tasks()
+        detele_task()
     elif user_pick == 4:
+        print_tasks()
+    elif user_pick == 5:
         is_running = False
     else:
         print("NOT VALID MY MAN")
