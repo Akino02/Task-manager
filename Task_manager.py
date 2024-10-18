@@ -70,10 +70,10 @@ def create_task():
     data = []
     task_name = input("Enter task name: ")
     data.append(task_name)
-    priority = try_int_input("Enter priority of task: ")
-    data.append(priority)
-    status = try_int_input("Enter status of task: ")
-    data.append(status)
+    priority = try_int_input(f"Enter priority of task ({priority_names[0]} 0-{len(priority_names)-1} {priority_names[len(priority_names)-1]}): ")
+    data.append(priority_names[priority])
+    status = try_int_input(f"Enter status of task ({status_names[0]} 0-{len(status_names)-1} {status_names[len(status_names)-1]}): ")
+    data.append(status_names[status])
 
     sql = f" INSERT INTO task (task_name, priority, status) VALUES (?, ?, ?) "
 
@@ -109,17 +109,17 @@ def change_task_atributs():
         # con.commit()
     
     elif chosen_modification == 2:
-        new_atribute_number = try_int_input("Enter new priority value: ")
+        new_atribute_number = try_int_input(f"Enter new priority value ({priority_names[0]} 0-{len(priority_names)-1} {priority_names[len(priority_names)-1]}): ")
         # change_atribute(new_atribute_number-1)
-        data.append(priority_names[new_atribute_number-1])
+        data.append(priority_names[new_atribute_number])
         sql = f"UPDATE task SET {collums[chosen_modification-1]} = ? WHERE id = {task_id} "
         cur.execute(sql, data)
         # con.commit()
 
     elif chosen_modification == 3:
-        new_atribute_number = try_int_input("Enter new status value: ")
+        new_atribute_number = try_int_input(f"Enter new status value ({status_names[0]} 0-{len(status_names)-1} {status_names[len(status_names)-1]}): ")
         # change_atribute(new_atribute_number-1)
-        data.append(status_names[new_atribute_number-1])
+        data.append(status_names[new_atribute_number])
         sql = f" UPDATE task SET {collums[chosen_modification-1]} = ? WHERE id = {task_id} "
         cur.execute(sql, data)
         # con.commit()
